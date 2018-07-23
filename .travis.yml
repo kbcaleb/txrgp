@@ -2,8 +2,8 @@ language: ruby
 rvm:
 - 2.5.1
 before_script:
-- chmod +x ./scripts/jcheck
-script: "./scripts/jcheck"
+- chmod +x ./scripts/jekyll-cicd
+script: ./scripts/jekyll-cicd
 branches:
   only:
   - master

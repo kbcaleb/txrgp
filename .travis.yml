@@ -5,6 +5,7 @@ before_install:
 - 'rvm install 2.5.1'
 - 'gem install bundler'
 - 'gem install jekyll'
+- 'gem install html-proofer'
 install:
 - 'pip install awscli'
 before_script:

@@ -6,7 +6,7 @@ description: 'An innovative virtual debt resolution process… so people can mov
 popular procedure to resolve debt issues, both in collections or in the court system. We present a proven alternative to the expensive, time consuming and sometimes intimidating collection and legal processes.'
 baseurl:
 base_path:
-url: "http://www.txrgp.com" # the base hostname & protocol for your site
+url: "http://txrgp.com" # the base hostname & protocol for your site
 author: John Collins
 street_address: 14781 Memorial Drive, No 453
 city: Houston

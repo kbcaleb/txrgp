@@ -3,6 +3,8 @@ python:
 - '3.6'
 before_install:
 - 'rvm install 2.5.1'
+- 'gem install bundler'
+- 'gem install jekyll'
 install:
 - 'pip install awscli'
 before_script:

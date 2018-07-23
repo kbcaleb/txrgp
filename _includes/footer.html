@@ -1,0 +1,64 @@
+<!-- Contact -->
+
+<!-- Footer -->
+	<footer id="footer">
+		<div class="inner">
+			<ul class="copyright">
+				<li><span style="color:white">&copy; {{ site.title }} {{ site.subtitle }}</span><br /><br /></li>
+				<li>
+					<div class="contact-method">
+						<span class="icon alt fa-envelope"></span>
+						<h3>Email</h3>
+						<span style="color:white">
+						<a href="mailto:intake@txrgp.com?subject=Intake Request">{{ site.email }}</a>
+						</span>
+						<br />
+						<br />
+					</div>
+				</li>
+				<li>
+					<div class="contact-method">
+						<span class="icon alt fa-phone"></span>
+						<h3>Phone</h3>
+						<span style="color:white">{{ site.phone }}</span>
+						<br />
+						<br />
+					</div>
+				</li>
+				<li>
+					<div class="contact-method">
+						<span class="icon alt fa-home"></span>
+						<h3>Address</h3>
+						<span style="color:white">
+						{% if site.street_address %}
+						    {{ site.street_address }}<br />
+						{% endif %}
+						{% if site.city %}
+						    {{ site.city }},
+						{% endif %}
+						{% if site.state %}
+						    {{ site.state }}
+						{% endif %}
+						{% if site.zip_code %}
+						    {{ site.zip_code }}<br />
+						{% endif %}
+						{% if site.country %}
+						    {{ site.country }}
+						{% endif %}
+						</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</footer>
+
+</div>
+
+<!-- Scripts -->
+	<script src="{{ "assets/js/jquery.min.js" | absolute_url }}"></script>
+	<script src="{{ "assets/js/jquery.scrolly.min.js" | absolute_url }}"></script>
+	<script src="{{ "assets/js/jquery.scrollex.min.js" | absolute_url }}"></script>
+	<script src="{{ "assets/js/skel.min.js" | absolute_url }}"></script>
+	<script src="{{ "assets/js/util.js" | absolute_url }}"></script>
+	<!--[if lte IE 8]><script src="{{ "assets/js/ie/respond.min.js" | absolute_url }}"></script><![endif]-->
+	<script src="{{ "assets/js/main.js" | absolute_url }}"></script>

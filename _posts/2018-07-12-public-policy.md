@@ -2,7 +2,7 @@
 title: Public Policy
 layout: landing
 description: 'Virtual process means there are no physical meetings for the parties to travel and attend.'
-image: /assets/images/publicpolicy.jpg
+image: assets/images/publicpolicy.jpg
 nav-menu: true
 ---
 

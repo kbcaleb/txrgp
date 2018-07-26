@@ -5,5 +5,5 @@ bundle exec jekyll build
 bundle exec htmlproofer --empty-alt-ignore true ./_site
 
 if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
-  aws s3 sync ./_site/ s3://$S3_BUCKET/ --delete --acl public-read
+  aws s3 sync ./_site/ s3://$S3_BUCKET/ --delete
 fi

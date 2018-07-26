@@ -1,0 +1,11 @@
+---
+extends: default
+ignore: |
+  */ci/config.yml
+rules:
+  indentation:
+    indent-sequences: false
+  line-length:
+    max: 999
+  comments:
+    min-spaces-from-content: 1

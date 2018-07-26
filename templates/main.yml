@@ -1,0 +1,141 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: txrgp.com
+
+Parameters:
+  DomainName:
+    Description: 'Primary domain name for new static site.'
+    Type: String
+    Default: 'txrgp.com'
+  DefaultObject:
+    Description: 'The name of the index document.'
+    Type: String
+    Default: 'index.html'
+  ACMCertificate:
+    Description: 'ARN for SSL certificate'
+    Type: String
+    Default: 'arn:aws:acm:us-east-1:068429281899:certificate/c912a127-f1ba-45a4-bdc8-db9260c9809d'
+
+Conditions:
+  ACMCertificateCondition: !Not [!Equals [!Ref ACMCertificate, '']]
+
+Resources:
+  CloudFrontOriginAccessIdentity:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub ${DomainName}
+  Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub '${DomainName}-static'
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LogBucket
+        LogFilePrefix: 'logs/s3/'
+      VersioningConfiguration:
+        Status: Enabled
+  BucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref Bucket
+      PolicyDocument:
+        Statement:
+        - Action: 's3:GetObject'
+          Effect: Allow
+          Resource: !Sub 'arn:aws:s3:::${Bucket}/*'
+          Principal:
+            CanonicalUser: !GetAtt 'CloudFrontOriginAccessIdentity.S3CanonicalUserId'
+  LogBucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketName: !Sub '${DomainName}-logging'
+      LifecycleConfiguration:
+        Rules:
+        - Id: Transition3090daysRetain7yrs
+          Status: Enabled
+          ExpirationInDays: 2555
+          Transitions:
+          - TransitionInDays: 30
+            StorageClass: STANDARD_IA
+          - TransitionInDays: 90
+            StorageClass: GLACIER
+      VersioningConfiguration:
+        Status: Enabled
+  LogBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref LogBucket
+      PolicyDocument:
+        Statement:
+        - Sid: Enforce HTTPS Connections
+          Action: s3:*
+          Effect: Deny
+          Principal: '*'
+          Resource: !Sub 'arn:aws:s3:::${LogBucket}/*'
+          Condition:
+            Bool:
+              aws:SecureTransport: false
+        - Sid: Restrict Delete* Actions
+          Action: s3:Delete*
+          Effect: Deny
+          Principal: '*'
+          Resource: !Sub 'arn:aws:s3:::${LogBucket}/*'
+        - Sid: DenyUnEncryptedObjectUploads
+          Effect: Deny
+          Principal: '*'
+          Action: s3:PutObject
+          Resource: !Sub 'arn:aws:s3:::${LogBucket}/*'
+          Condition:
+            StringNotEquals:
+              s3:x-amz-server-side-encryption: AES256
+  CloudFrontDistribution:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Aliases:
+        - !Ref DomainName
+        - !Join ['', ['www.', !Ref DomainName]]
+        Comment: !Sub DomainName
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          CachedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          Compress: true
+          DefaultTTL: 3600
+          ForwardedValues:
+            Cookies:
+              Forward: none
+            QueryString: false
+          MaxTTL: 86400
+          MinTTL: 60
+          TargetOriginId: s3origin
+          ViewerProtocolPolicy: 'redirect-to-https'
+        DefaultRootObject: !Ref DefaultObject
+        Enabled: true
+        HttpVersion: http2
+        Logging:
+          Bucket: !GetAtt 'LogBucket.DomainName'
+          Prefix: 'logs/cloudfront/'
+        Origins:
+        - DomainName: !GetAtt 'Bucket.DomainName'
+          Id: s3origin
+          S3OriginConfig:
+            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+        PriceClass: 'PriceClass_All'
+        ViewerCertificate:
+          AcmCertificateArn: !If [ACMCertificateCondition, !Ref ACMCertificate, !Ref 'AWS::NoValue']
+          MinimumProtocolVersion: 'TLSv1.1_2016'
+          SslSupportMethod: 'sni-only'
+
+Outputs:
+  CloudFrontURL:
+    Description: CloudFront URL
+    Value: !GetAtt 'CloudFrontDistribution.DomainName'
